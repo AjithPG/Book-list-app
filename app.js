@@ -35,12 +35,32 @@ class UI{
         <td>${book.title}</td>
         <td>${book.author}</td>
         <td>${book.isbn}</td>
-        <td><a href="#" class="btn btn-danger btn-sm delete"><i class="fas fa-times-circle"></i></a></td>
+        <td><a href="#" class="btn btn-danger btn-sm "><i class="fas fa-times-circle delete"></i></a></td>
         `;
 
         list.appendChild(row);
+
     }
 
+    static deleteBook(el){
+      if(el.classList.contains('delete')){
+        el.parentElement.parentElement.parentElement.remove();
+      }
+    }
+
+    static showAlert(message,className){
+        const div = document.createElement('div');
+        div.className = `alert alert-${className}`;
+        div.appendChild(document.createTextNode(message));
+        const container =document.querySelector(".container");
+        const form = document.querySelector("#book-form");
+        container.insertBefore(div,form);
+
+        //vanish in 3 sec
+
+        setTimeout(()=>document.querySelector('.alert').remove(),3000);
+
+    }
     static clearFields(){
         document.querySelector('#title').value = '';
         
@@ -60,15 +80,33 @@ document.querySelector('#book-form').addEventListener('submit',(e)=>{
     const author = document.querySelector('#author').value;
     const isbn = document.querySelector('#isbn').value;
     
+    //validate
+    if(title === '' || author === '' || isbn === ''){
+        UI.showAlert('Please fill all the field','danger');
+    } else{
     //Instatiate Book
     const book = new Book(title,author,isbn);
 
     //Add books to UI
     UI.addBookToList(book);
+
+    //show  success alert
+
+    UI.showAlert('New Book Added','success');
     
     //clear field
     UI.clearFields();
+    }
+
 
 });
 
 //Event:Remove a Book
+document.querySelector('#book-list').addEventListener('click',(e) => {
+
+UI.deleteBook(e.target);
+
+UI.showAlert('Book Deleted','danger');
+
+});
+
