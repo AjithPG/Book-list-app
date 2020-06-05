@@ -6,23 +6,11 @@ class Book{
       this.isbn = isbn;
     }
 }
+
 //UI class :Handle UI tasks
 class UI{
     static displayBooks(){
-        const StoredBooks = [
-           {
-               title:'Book One',
-               author:'John Doe',
-               isbn:'3434343'
-           },
-           {
-
-               title:'Book two',
-               author:'John Doe',
-               isbn:'454545'
-           }
-        ];
-      const books = StoredBooks;
+      const books = Store.getBook();
 
       books.forEach((book) => UI.addBookToList(book));
     }
@@ -70,6 +58,43 @@ class UI{
     }
 }
 //Store class:Handle Storage
+class Store {
+static getBook() {
+
+    let books;
+    if(localStorage.getItem('books') === null){
+        books = [];
+    }else{
+        books = JSON.parse(localStorage.getItem('books'));
+    }
+
+    return books;
+}
+
+static addBook(book) {
+ const books = Store.getBook();
+ books.push(book);
+ localStorage.setItem('books',JSON.stringify(books));
+
+}
+
+static removeBook(isbn){
+const books = Store.getBook();
+
+books.forEach((book,index)=>{
+    if(book.isbn === isbn){
+        books.splice(index,1);
+    }
+});
+
+localStorage.setItem('books',JSON.stringify(books));
+
+}
+
+}
+
+
+
 //Event:Display Books
 document.addEventListener('DOMContentLoaded', UI.displayBooks);
 //Event:Add a book
@@ -90,6 +115,10 @@ document.querySelector('#book-form').addEventListener('submit',(e)=>{
     //Add books to UI
     UI.addBookToList(book);
 
+    //Add book to store
+
+    Store.addBook(book);
+
     //show  success alert
 
     UI.showAlert('New Book Added','success');
@@ -104,9 +133,12 @@ document.querySelector('#book-form').addEventListener('submit',(e)=>{
 //Event:Remove a Book
 document.querySelector('#book-list').addEventListener('click',(e) => {
 
+    //remove book from store
 UI.deleteBook(e.target);
 
-UI.showAlert('Book Deleted','danger');
+Store.removeBook(e.target.parentElement.parentElement.previousElementSibling.textContent);
+
+UI.showAlert('Book removed','danger');
 
 });
 
